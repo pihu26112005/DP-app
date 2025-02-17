@@ -1,117 +1,169 @@
-import React, { useState } from "react";
-import { SafeAreaView, View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
-import { LineChart } from "react-native-chart-kit";
-import { Dimensions } from "react-native";
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, ScrollView, View, Text, ActivityIndicator, Dimensions } from 'react-native';
+// import { LineChart, Grid, XAxis, YAxis } from 'react-native-svg-charts';
+// import { G, Line } from 'react-native-svg';
+import PieChart from 'react-native-pie-chart'
+import CustomButton from '../../components/CustomButton';
 
-const screenWidth = Dimensions.get("window").width;
+const ResultPage = () => {
+  const [latestResult, setLatestResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [dielectricValue, setDielectricValue] = useState(null);
+  const [volume, setVolume] = useState(null);
 
-const CreateResultUI = () => {
-  // Hardcoded data for display
-  const [adulterantData, setAdulterantData] = useState({
-    isAdulterated: true,
-    adulterantType: "Melamine",
-    adulterantLevel: "15%", // Hardcoded
-    graphData: {
-      labels: ["0%", "5%", "10%", "15%", "20%"],
-      datasets: [
-        {
-          data: [0, 5, 10, 15, 20], // Mock values for the graph
-          color: () => `rgba(255, 0, 0, 0.5)`, // Red color for highlighting adulteration
-        },
-      ],
-    },
-  });
-
-  const handleCheck = async () => {
-    // Alert.alert(
-    //   "Adulterant Check",
-    //   adulterantData.isAdulterated
-    //     ? `Adulterant Found: ${adulterantData.adulterantType} at ${adulterantData.adulterantLevel}`
-    //     : "Milk is Safe!"
-    // );
-    const uniqueId = "123"; // Replace with dynamic ID if needed
-    const serverIP = "172.16.17.205"; // Replace with your laptop's local IP
-
+  const fetchLatestResult = async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`http://${serverIP}:5000/result?uniqueId=${uniqueId}`);
-      const result = await response.json();
-
-      if (response.ok) {
-        const { result: { prediction } = {} } = result; // Extract prediction from response
-        Alert.alert("Adulteration Result", `Adulterant Level Prediction: ${prediction}%`);
-      } else {
-        Alert.alert("Error hogyi", result.error || "Failed to fetch result.");
-      }
+      const response = await fetch('https://dp-project-theta.vercel.app/api/getLatestResult');
+      const data = await response.json();
+      setLatestResult(data);
+      extractValue(data.matched_file_name);
     } catch (error) {
-      console.error("Error fetching result:", error);
-      Alert.alert("Error", "Failed to connect to the server.");
+      console.error('Error fetching latest result:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <SafeAreaView className="bg-primary h-full">
-      <ScrollView className="px-4 my-6">
-        <Text className="text-2xl text-white font-semibold mb-6 mt-8">
-          Milk Adulteration Test Results
-        </Text>
+  useEffect(() => {
+    fetchLatestResult();
+  }, []);
 
-        {/* Adulterant Indicator */}
-        <View
-          className={`${adulterantData.isAdulterated ? "bg-red-500" : "bg-green-500"
-            } p-4 rounded-xl flex items-center`}
-        >
-          <Text className="text-white text-xl font-semibold">
-            {adulterantData.isAdulterated
-              ? "Adulterant Detected"
-              : "No Adulterant Found"}
-          </Text>
+  const handleCheckResult = () => {
+    fetchLatestResult();
+  };
+
+  const extractValue = (fileName) => {
+    const match = fileName.match(/DK_(\d+\.\d+)\.csv/);
+    if (match) {
+      const dielectricConstant = parseFloat(match[1]);
+      setDielectricValue(dielectricConstant);
+      calculateVolume(dielectricConstant);
+    }
+  };
+
+  const calculateVolume = (er) => {
+    const emelamine = 6;
+    const emilk = 40;
+    const erCubedRoot = Math.cbrt(er);
+    const emelamineCubedRoot = Math.cbrt(emelamine);
+    const emilkCubedRoot = Math.cbrt(emilk);
+
+    const v = (erCubedRoot - emilkCubedRoot) / (emelamineCubedRoot - emilkCubedRoot);
+    setVolume(v);
+  };
+
+  const prepareChartData = (freqArray, valuesArray) => {
+    // Remove the first two null values
+    const filteredFreq = freqArray.slice(2);
+    const filteredValues = valuesArray.slice(2);
+
+    return filteredValues;
+  };
+
+  const widthAndHeight = 250;
+  const series = volume !== null ? [volume * 100, (1 - volume) * 100] : [0, 100];
+  const sliceColor = ['#3f2305', '#776b5d'];
+
+  return (
+    <SafeAreaView className="bg-bkk h-full">
+      <ScrollView className="px-4 my-6">
+        <View className="mt-7 space-y-2">
+          <CustomButton
+            title="Check Result"
+            handlePress={handleCheckResult}
+            customStyle="mt-7"
+            isLoading={loading}
+          />
         </View>
 
-        {/* Adulterant Details */}
-        {adulterantData.isAdulterated && (
-          <View className="mt-6">
-            <Text className="text-lg text-gray-100 font-medium">
-              Adulterant Type:{" "}
-              <Text className="font-semibold">{adulterantData.adulterantType}</Text>
-            </Text>
-            <Text className="text-lg text-gray-100 font-medium mt-3">
-              Adulterant Level:{" "}
-              <Text className="font-semibold">{adulterantData.adulterantLevel}</Text>
-            </Text>
+        {loading && (
+          <View className="mt-14 mb-7 space-y-2">
+            <ActivityIndicator size="large" color="#0000ff" />
           </View>
         )}
 
-        {/* Graph for Adulterant Level */}
-        <Text className="text-lg text-gray-100 font-semibold mt-10">
-          Adulterant Level Graph
-        </Text>
-        <LineChart
-          data={adulterantData.graphData}
-          width={screenWidth * 0.9} // from react-native
-          height={220}
-          chartConfig={{
-            backgroundColor: "#1e2923",
-            backgroundGradientFrom: "#08130d",
-            backgroundGradientTo: "#08130d",
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            strokeWidth: 2, // optional, default 3
-          }}
-          style={{
-            marginVertical: 10,
-            borderRadius: 16,
-          }}
-        />
+        {(latestResult && !loading) && (
+          <View className="mt-14 mb-7 space-y-2">
+            <Text className="text-base text-center text-black font-pmedium">
+              Latest Result
+            </Text>
+            {dielectricValue && (
+              <View className="w-full h-16 px-4 bg-bhosda-1 rounded-2xl border-2 border-black-200 flex justify-center items-center flex-row space-x-2">
+                <Text className="text-sm text-black-100 font-pmedium">
+                  Dielectric Value: {dielectricValue}
+                </Text>
+              </View>
+            )}
+            {volume !== null && (
+              <View className="w-full h-16 px-4 mb-8 bg-bhosda-1 rounded-2xl border-2 border-black-200 flex justify-center items-center flex-row space-x-2">
+                <Text className="text-sm text-black-100 font-pmedium">
+                  Concentration : {volume.toFixed(2)}
+                </Text>
+              </View>
+            )}
+            {/* {latestResult.raw_file_freq && latestResult.raw_file_values && (
+              <View style={{ height: 300, flexDirection: 'row' }}>
+                <YAxis
+                  data={prepareChartData(latestResult.raw_file_freq, latestResult.raw_file_values)}
+                  contentInset={{ top: 20, bottom: 20 }}
+                  svg={{
+                    fill: 'grey',
+                    fontSize: 10,
+                  }}
+                  numberOfTicks={10}
+                  formatLabel={(value) => `${value}`}
+                />
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <LineChart
+                    style={{ flex: 1 }}
+                    data={prepareChartData(latestResult.raw_file_freq, latestResult.raw_file_values)}
+                    svg={{ stroke: '#c43a31' }}
+                    contentInset={{ top: 20, bottom: 20 }}
+                  >
+                    <Grid />
+                  </LineChart>
+                  <XAxis
+                    style={{ marginHorizontal: -10, height: 30 }}
+                    data={latestResult.raw_file_freq.slice(2)}
+                    formatLabel={(value, index) => index}
+                    contentInset={{ left: 10, right: 10 }}
+                    svg={{ fontSize: 10, fill: 'grey' }}
+                  />
+                </View>
+              </View>
+            )} */}
+            {volume !== null && (
+              <View className="flex justify-center items-center mt-10">
+                <PieChart
+                  widthAndHeight={widthAndHeight}
+                  series={series}
+                  sliceColor={sliceColor}
+                  // coverRadius={0.45}
+                  coverFill={'#FFF'}
+                />
+                <View className="mt-4">
+                  <View className="flex flex-row items-center">
+                    <View className="w-2.5 h-2.5 rounded-full bg-[#3f2305] mr-2" />
+                    <Text className="text-base text-center text-black-100 font-pmedium">
+                      Melamine : {volume.toFixed(2) * 100}%
+                    </Text>
+                  </View>
+                  <View className="flex flex-row items-center">
+                    <View className="w-2.5 h-2.5 rounded-full bg-[#776b5d] mr-2" />
+                    <Text className="text-base text-center text-black-100 font-pmedium">
+                      Milk : {((1 - volume).toFixed(2))* 100}%
+                    </Text>
+                  </View>
+                </View>
+              </View>
 
-        {/* Check Result Button */}
-        <TouchableOpacity
-          className="mt-8 p-4 bg-blue-600 rounded-xl flex items-center"
-          onPress={handleCheck}
-        >
-          <Text className="text-white text-lg">Check Result</Text>
-        </TouchableOpacity>
+            )}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default CreateResultUI;
+export default ResultPage;

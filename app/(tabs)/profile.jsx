@@ -24,7 +24,7 @@ const Profile = () => {
   };
 
   return (
-    <SafeAreaView className="bg-primary h-full">
+    <SafeAreaView className="bg-bkk h-full">
       <FlatList
         data={posts}
         keyExtractor={(item) => item.$id}
@@ -56,7 +56,7 @@ const Profile = () => {
               />
             </TouchableOpacity>
 
-            <View className="w-16 h-16 border border-blue-1 rounded-lg flex justify-center items-center">
+            <View className="w-16 h-16 border border-bhosda-1 rounded-lg flex justify-center items-center">
               <Image
                 source={{ uri: user?.avatar }}
                 className="w-[90%] h-[90%] rounded-lg"

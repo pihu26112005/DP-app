@@ -63,9 +63,9 @@ const Home = () => {
   };
 
   return (
-    <SafeAreaView className="bg-primary">
+    <SafeAreaView className="bg-bkk">
       <FlatList
-        data={previousScans}
+        data={previousScans} 
         className="h-full"
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
@@ -79,8 +79,8 @@ const Home = () => {
           <View className="flex my-6 px-4 space-y-6">
             <View className="flex justify-between items-start flex-row mb-6">
               <View>
-                <Text className="font-pmedium text-sm text-gray-100">Welcome Back</Text>
-                <Text className="text-2xl font-psemibold text-white">Piyush</Text>
+                <Text className="font-pmedium text-sm text-black-100">Welcome Back</Text>
+                <Text className="text-2xl font-psemibold text-bhosda-2">Piyush</Text>
               </View>
 
               <View className="mt-1.5">
@@ -96,7 +96,7 @@ const Home = () => {
 
             {/* Previous Scans Section */}
             <View className="w-full flex-1 pt-5 pb-8">
-              <Text className="text-lg font-pregular text-gray-100 mb-3">
+              <Text className="text-lg font-pregular text-black-100 mb-3">
                 Previous Scans
               </Text>
 
@@ -117,7 +117,7 @@ const Home = () => {
 
             {/* Articles Section */}
             <View className="w-full flex-1 pt-5 pb-8">
-              <Text className="text-lg font-pregular text-gray-100 mb-3">
+              <Text className="text-lg font-pregular text-black-200 mb-3">
                 Articles on Milk Adulteration
               </Text>
 

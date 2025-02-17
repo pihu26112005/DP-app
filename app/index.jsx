@@ -11,18 +11,18 @@ export default function App() {
 
   const {isLoading, isLoggedin} = useGlobalContext();
   if(!isLoading && isLoggedin){
-    <Redirect href="/home" />;
-  }
+    <Redirect href="/home" />; 
+  } 
 
   return (
     // <View style={styles.container}>
 
-    <SafeAreaView className='h-full bg-primary items-center justify-center'>
+    <SafeAreaView className='h-full bg-bkk items-center justify-center'>
       <ScrollView contentContainerStyle={{height:'100%'}}>
         <View className='w-full min-h-[85vh] justify-center items-center px-4'>
           <View >
-            <Text className='text-white text-3xl text-center '>Welcome back To our platform {' '}</Text>
-            <Text className='text-blue-1 text-center text-3xl'>Sora</Text>
+            <Text className='text-black text-3xl text-center '>Welcome back To our platform {' '}</Text>
+            <Text className='text-bhosda-2 text-center text-3xl'>Sora</Text>
           </View>
           <CustomButton 
           title="Continue with email"

@@ -38,9 +38,9 @@ const SignIn = () => {
       setSubmitting(false);
     }
   };
-
+ 
   return (
-    <SafeAreaView className="bg-primary h-full">
+    <SafeAreaView className="bg-bkk h-full">
       <ScrollView>
         <View
           className="w-full flex justify-center items-center h-[80vh] px-4 my-6"
@@ -54,7 +54,7 @@ const SignIn = () => {
             className="w-[115px] h-[34px]"
           /> */}
 
-          <Text className="text-2xl font-semibold text-white mt-10 font-psemibold">
+          <Text className="text-2xl font-semibold text-black mt-10 font-psemibold">
             Log in
           </Text>
 
@@ -81,12 +81,12 @@ const SignIn = () => {
           />
 
           <View className="flex justify-center pt-5 flex-row gap-2">
-            <Text className="text-sm text-gray-100 font-pregular">
+            <Text className="text-sm text-black-100 font-pregular">
               Don't have an account?
             </Text>
             <Link
               href="/sign-up"
-              className="text-sm font-psemibold text-blue-1"
+              className="text-sm font-psemibold text-bhosda-2"
             >
               Signup
             </Link>

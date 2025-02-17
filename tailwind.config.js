@@ -5,9 +5,9 @@ module.exports = {
     extend: {
       colors: {
         blue: {
-          1:'#0CAFFF'
+          1:'#ebe3d5' 
         },
-        primary: "#161622",
+        primary: "#3f2305",
         secondary: {
           DEFAULT: "#FF9C01",
           100: "#FF9001",
@@ -21,6 +21,13 @@ module.exports = {
         gray: {
           100: "#CDCDE0",
         },
+        bhosda: {
+          1: "#ebe3d5",
+          2: "#3f2305",
+          3: "#f3eeea",
+          4: "#776b5d"
+        },
+        bkk: "#ebe3d5"
       },
       fontFamily: {
         pthin: ["Poppins-Thin", "sans-serif"],
